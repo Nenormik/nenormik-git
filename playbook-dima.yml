@@ -43,9 +43,13 @@
         enabled: yes
 
     - name: Добавление GPG ключа для Jenkins
-      apt_key:
-        url: https://pkg.jenkins.io/debian/jenkins.io.key
-        state: present
+      block:
+       - apt_key:
+           url: "https://pkg.jenkins.io/debian/jenkins.io.key"
+           state: present
+      rescue:
+       - debug:
+           msg: "Не удалось добавить GPG ключ для Jenkins, но продолжаем выполнение playbook."
 
     - name: Добавление репозитория Jenkins
       apt_repository:
@@ -79,7 +83,7 @@
         state: started
         restart_policy: always
         published_ports:
-          - "8080:8080"
+          - "8081:8081"
           - "50000:50000"
         volumes:
           - jenkins_home:/var/jenkins_home
